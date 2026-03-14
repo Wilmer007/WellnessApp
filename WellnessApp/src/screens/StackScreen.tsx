@@ -1,109 +1,67 @@
-/*import React, { useState } from 'react';
-import { View, Text, StyleSheet, Button, TextInput } from 'react-native';
-
-import { Stack } from '../estructurasDatas/Stack';
+import React, { useState, useContext } from "react";
+import { View, Text, TextInput, Button, FlatList, StyleSheet } from "react-native";
+import { DataContext } from "../Context/DataContext";
 
 export default function StackScreen() {
 
-  const [stack] = useState(new Stack<string>());
+  const context = useContext(DataContext);
+  if (!context) throw new Error("DataContext missing");
 
-  const [action, setAction] = useState('');
-  const [stackItems, setStackItems] = useState<string[]>([]);
-  const [lastRemoved, setLastRemoved] = useState<string | null>(null);
+  const { stackItems, addStackItem, removeStackItem } = context;
 
-  const addAction = () => {
-    if (action.trim() === '') return;
+  const [input, setInput] = useState("");
 
-    stack.push(action);
-    setStackItems([...stackItems, action]);
-    setAction('');
-  };
-
-  const undoAction = () => {
-    const removed = stack.pop();
-
-    if (removed) {
-      setLastRemoved(removed);
-      setStackItems(stackItems.slice(0, -1));
-    }
+  const handleAdd = () => {
+    if (!input.trim()) return;
+    addStackItem(input);
+    setInput("");
   };
 
   return (
     <View style={styles.container}>
 
-      <Text style={styles.title}>Action Stack (LIFO)</Text>
+      <Text style={styles.title}>Stack (LIFO)</Text>
 
       <TextInput
         style={styles.input}
-        placeholder="Enter an action"
-        value={action}
-        onChangeText={setAction}
+        placeholder="Enter activity"
+        value={input}
+        onChangeText={setInput}
       />
 
-      <View style={styles.buttonContainer}>
-        <Button title="Push Action" onPress={addAction}/>
-      </View>
+      <Button title="Push" onPress={handleAdd} />
 
-      <View style={styles.buttonContainer}>
-        <Button title="Undo Last Action" onPress={undoAction}/>
-      </View>
+      <Button title="Pop" onPress={removeStackItem} />
 
-      {lastRemoved && (
-        <Text style={styles.result}>
-          Last Removed: {lastRemoved}
-        </Text>
-      )}
+      <Text style={styles.label}>Top</Text>
 
-      <Text style={styles.sectionTitle}>Stack History</Text>
+      <FlatList
+        data={[...stackItems].reverse()}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => (
+          <View style={styles.item}>
+            <Text>{item.title}</Text>
+          </View>
+        )}
+      />
 
-      {stackItems.slice().reverse().map((item, index) => (
-        <Text key={index}>• {item}</Text>
-      ))}
+      <Text style={styles.label}>Bottom</Text>
 
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-
-  container: {
-    flex: 1,
-    padding: 20,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20
-  },
-
-  input: {
-    borderWidth: 1,
-    width: '100%',
-    padding: 10,
-    borderRadius: 6,
-    marginBottom: 15
-  },
-
-  buttonContainer: {
-    width: '80%',
-    marginVertical: 5
-  },
-
-  result: {
-    marginTop: 20
-  },
-
-  sectionTitle: {
-    marginTop: 20,
-    fontWeight: 'bold'
-  }
-
-}); */
+  container:{ flex:1, padding:20 },
+  title:{ fontSize:24, fontWeight:"bold" },
+  input:{ borderWidth:1, padding:10, marginVertical:10 },
+  item:{ padding:10, borderWidth:1, marginVertical:5 },
+  label:{ marginTop:10, color:"gray" }
+});
 
 // AQUIIIIIIII
+
+/*
 
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Button, TextInput, ScrollView } from 'react-native';
@@ -146,7 +104,6 @@ export default function StackScreen() {
         <Button title="Undo Last Action" onPress={undoAction} />
       </View>
 
-      {/* FIX: Explicit boolean check using ternary */}
       {lastRemoved ? (
         <Text style={styles.result}>Last Removed: {lastRemoved}</Text>
       ) : null}
@@ -167,3 +124,5 @@ const styles = StyleSheet.create({
   result: { marginTop: 20 },
   sectionTitle: { marginTop: 20, fontWeight: 'bold' }
 });
+
+*/

@@ -1,39 +1,75 @@
-import React from 'react';
-import { View, Text, StyleSheet, FlatList, Button } from 'react-native';
+import React, { useState, useContext } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet
+} from "react-native";
 
-const wellnessItems = [
-  { id: 1, title: "Drink Water", description: "Stay hydrated throughout the day.", type: "Health" },
-  { id: 2, title: "Meditation", description: "Practice mindfulness for 5 minutes.", type: "Mental" },
-  { id: 3, title: "Stretching", description: "Stretch to improve flexibility.", type: "Fitness" },
-  { id: 4, title: "Short Walk", description: "Take a 10 minute walk outside.", type: "Fitness" },
-  { id: 5, title: "Deep Breathing", description: "Relax with controlled breathing.", type: "Mental" }
-];
+import { DataContext } from "../Context/DataContext";
 
 export default function ContentScreen() {
+
+  const context = useContext(DataContext);
+
+  if (!context) {
+    throw new Error("DataContext not found");
+  }
+
+  const {
+    addStackItem,
+    addQueueItem
+  } = context;
+
+  const [input, setInput] = useState("");
+
+  const handleAddToStack = () => {
+    if (!input.trim()) return;
+
+    addStackItem(input);
+    setInput("");
+  };
+
+  const handleAddToQueue = () => {
+    if (!input.trim()) return;
+
+    addQueueItem(input);
+    setInput("");
+  };
 
   return (
     <View style={styles.container}>
 
-      <Text style={styles.title}>Wellness Activities</Text>
+      <Text style={styles.title}>
+        Add Wellness Activity
+      </Text>
 
-      <FlatList
-        data={wellnessItems}
-        keyExtractor={(item) => item.id.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.card}>
+      <Text style={styles.description}>
+        Enter a wellness activity such as meditation,
+        stretching, journaling, or breathing exercises.
+      </Text>
 
-            <Text style={styles.cardTitle}>{item.title}</Text>
-            <Text>{item.description}</Text>
-            <Text style={styles.type}>{item.type}</Text>
-
-            <Button
-              title="Add to Queue"
-              onPress={() => alert(item.title + " added to queue (demo)")}
-            />
-
-          </View>
-        )}
+      <TextInput
+        style={styles.input}
+        placeholder="Enter activity..."
+        value={input}
+        onChangeText={setInput}
       />
+
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Add to Stack (LIFO)"
+          onPress={handleAddToStack}
+        />
+      </View>
+
+      <View style={styles.buttonContainer}>
+        <Button
+          title="Add to Queue (FIFO)"
+          onPress={handleAddToQueue}
+        />
+      </View>
 
     </View>
   );
@@ -43,31 +79,32 @@ const styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    padding: 20
+    padding: 20,
+    justifyContent: "center"
   },
 
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    textAlign: 'center'
-  },
-
-  card: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 15,
+    fontSize: 26,
+    fontWeight: "bold",
     marginBottom: 10
   },
 
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: 'bold'
+  description: {
+    fontSize: 16,
+    marginBottom: 20,
+    color: "gray"
   },
 
-  type: {
-    marginTop: 5,
-    fontStyle: 'italic'
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    padding: 12,
+    borderRadius: 5,
+    marginBottom: 20
+  },
+
+  buttonContainer: {
+    marginBottom: 10
   }
 
 });

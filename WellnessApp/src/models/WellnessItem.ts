@@ -1,4 +1,4 @@
-export type WellnessType = 'Fitness' | 'Nutrition' | 'Mental Health';
+export type WellnessType = 'Fitness' | 'Nutrition' | 'Mental' | 'Sleep' | 'Health';
 
 export interface WellnessItem {
   id: number;
