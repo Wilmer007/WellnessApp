@@ -7,10 +7,8 @@ import { DataProvider } from "./src/Context/DataContext";
 import HomeScreen from "./src/screens/HomeScreen";
 import StackScreen from "./src/screens/StackScreen";
 import QueueScreen from "./src/screens/QueueScreen";
-import HistoryScreen from "./src/screens/HistoryScreen";
-import ContentScreen from "./src/screens/ContentScreen";
+import SavedItemsScreen from "./src/screens/SavedItemsScreen";
 import AboutScreen from "./src/screens/AboutScreen";
-import LoginScreen from "./src/screens/LoginScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -19,17 +17,11 @@ export default function App() {
     <DataProvider>
       <NavigationContainer>
         <Stack.Navigator>
-          <Stack.Screen
-    name="Login"
-    component={LoginScreen}
-    options={{ headerShown: false }}
-  />
 
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="Stack" component={StackScreen} />
           <Stack.Screen name="Queue" component={QueueScreen} />
-          <Stack.Screen name="History" component={HistoryScreen} />
-          <Stack.Screen name="Content" component={ContentScreen} />
+          <Stack.Screen name="SavedItems" component={SavedItemsScreen} />
           <Stack.Screen name="About" component={AboutScreen} />
 
         </Stack.Navigator>

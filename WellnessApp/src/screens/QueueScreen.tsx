@@ -5,9 +5,9 @@ import { DataContext } from "../Context/DataContext";
 export default function QueueScreen() {
 
   const context = useContext(DataContext);
-  if (!context) throw new Error("DataContext missing");
+  if (!context) throw new Error("Context error");
 
-  const { queueItems, addQueueItem, removeQueueItem } = context;
+  const { queueItems, addQueueItem, removeQueueItem, completeActivity } = context;
 
   const [input, setInput] = useState("");
 
@@ -15,6 +15,14 @@ export default function QueueScreen() {
     if (!input.trim()) return;
     addQueueItem(input);
     setInput("");
+  };
+
+  const handleComplete = () => {
+    if (queueItems.length === 0) return;
+
+    const item = queueItems[0];
+    completeActivity(item.title, "Queue (FIFO)");
+    removeQueueItem();
   };
 
   return (
@@ -29,23 +37,26 @@ export default function QueueScreen() {
         onChangeText={setInput}
       />
 
-      <Button title="Enqueue" onPress={handleAdd} />
+      <Button title="Enqueue Activity" onPress={handleAdd} />
+      <Button title="Complete First Activity" onPress={handleComplete} />
 
-      <Button title="Dequeue" onPress={removeQueueItem} />
 
-      <Text style={styles.label}>First</Text>
+<Text style={{ marginTop: 10, fontWeight: "bold" }}>
+  First →
+</Text>
 
       <FlatList
         data={queueItems}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
-          <View style={styles.item}>
+          <View style={styles.itemCard}>
             <Text>{item.title}</Text>
           </View>
         )}
       />
-
-      <Text style={styles.label}>Last</Text>
+      <Text style={{ marginTop: 10, fontWeight: "bold" }}>
+  ← Last
+</Text>
 
     </View>
   );
@@ -54,9 +65,15 @@ export default function QueueScreen() {
 const styles = StyleSheet.create({
   container:{ flex:1, padding:20 },
   title:{ fontSize:24, fontWeight:"bold" },
-  input:{ borderWidth:1, padding:10, marginVertical:10 },
+  input:{ borderWidth:1, marginVertical:10, padding:10 },
   item:{ padding:10, borderWidth:1, marginVertical:5 },
-  label:{ marginTop:10, color:"gray" }
+  itemCard: {
+  padding: 12,
+  borderRadius: 10,
+  backgroundColor: "white",
+  marginVertical: 5,
+  elevation: 2
+}
 });
 
 // AQUIIIIIIIIIII

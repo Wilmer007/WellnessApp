@@ -1,52 +1,34 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import React from "react";
+import { View, Text, StyleSheet } from "react-native";
 
 export default function AboutScreen() {
-
   return (
-
     <View style={styles.container}>
 
-      <Text style={styles.title}>About Wellness Tracker</Text>
+      <Text style={styles.title}>About This App</Text>
 
-      <Text>
-This application helps users manage wellness activities
-like hydration, meditation, and exercise.
+      <Text style={styles.text}>
+        This app helps users manage wellness activities using data structures.
       </Text>
 
-      <Text style={styles.subtitle}>Data Structures Used</Text>
-
-      <Text>
-Queue (FIFO) processes activities in the order added.
+      <Text style={styles.text}>
+        Stack (LIFO): Last activity added is completed first.
       </Text>
 
-      <Text>
-Stack (LIFO) records the most recent user actions.
+      <Text style={styles.text}>
+        Queue (FIFO): First activity added is completed first.
       </Text>
 
-      <Text>
-These structures demonstrate how computer science
-concepts power real applications.
+      <Text style={styles.text}>
+        The app allows tracking and managing daily healthy habits.
       </Text>
 
     </View>
-
   );
 }
 
 const styles = StyleSheet.create({
-
-  container: { flex: 1, padding: 20 },
-
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20
-  },
-
-  subtitle: {
-    marginTop: 20,
-    fontWeight: 'bold'
-  }
-
+  container:{ flex:1, padding:20 },
+  title:{ fontSize:24, fontWeight:"bold", marginBottom:10 },
+  text:{ marginBottom:10 }
 });

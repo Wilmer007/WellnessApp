@@ -5,9 +5,9 @@ import { DataContext } from "../Context/DataContext";
 export default function StackScreen() {
 
   const context = useContext(DataContext);
-  if (!context) throw new Error("DataContext missing");
+  if (!context) throw new Error("Context error");
 
-  const { stackItems, addStackItem, removeStackItem } = context;
+  const { stackItems, addStackItem, removeStackItem, completeActivity } = context;
 
   const [input, setInput] = useState("");
 
@@ -15,6 +15,14 @@ export default function StackScreen() {
     if (!input.trim()) return;
     addStackItem(input);
     setInput("");
+  };
+
+  const handleComplete = () => {
+    if (stackItems.length === 0) return;
+
+    const item = stackItems[stackItems.length - 1];
+    completeActivity(item.title, "Stack (LIFO)");
+    removeStackItem();
   };
 
   return (
@@ -29,23 +37,26 @@ export default function StackScreen() {
         onChangeText={setInput}
       />
 
-      <Button title="Push" onPress={handleAdd} />
+      <Button title="Push Activity" onPress={handleAdd} />
+      <Button title="Complete Top Activity" onPress={handleComplete} />
 
-      <Button title="Pop" onPress={removeStackItem} />
-
-      <Text style={styles.label}>Top</Text>
+<Text style={{ marginTop: 10, fontWeight: "bold" }}>
+  Top ↓
+</Text>
 
       <FlatList
         data={[...stackItems].reverse()}
         keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
-          <View style={styles.item}>
+          <View style={styles.itemCard}>
             <Text>{item.title}</Text>
           </View>
         )}
       />
 
-      <Text style={styles.label}>Bottom</Text>
+      <Text style={{ marginTop: 10, fontWeight: "bold" }}>
+  Bottom ↑
+</Text>
 
     </View>
   );
@@ -54,9 +65,15 @@ export default function StackScreen() {
 const styles = StyleSheet.create({
   container:{ flex:1, padding:20 },
   title:{ fontSize:24, fontWeight:"bold" },
-  input:{ borderWidth:1, padding:10, marginVertical:10 },
+  input:{ borderWidth:1, marginVertical:10, padding:10 },
   item:{ padding:10, borderWidth:1, marginVertical:5 },
-  label:{ marginTop:10, color:"gray" }
+  itemCard: {
+  padding: 12,
+  borderRadius: 10,
+  backgroundColor: "white",
+  marginVertical: 5,
+  elevation: 2
+}
 });
 
 // AQUIIIIIIII
