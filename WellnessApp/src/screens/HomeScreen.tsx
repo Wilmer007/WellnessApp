@@ -1,41 +1,53 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { DataContext } from "../Context/DataContext";
 
 export default function HomeScreen({ navigation }: any) {
+  const { stackItems, queueItems, historyItems } = useContext(DataContext);
+
   return (
     <View style={styles.container}>
+      <Text style={styles.title}>Wellness Tracker</Text>
 
-      <Text style={styles.title}>Wellness App</Text>
-      <Text style={styles.subtitle}>Manage your healthy habits</Text>
+      {/* Dashboard */}
+      <View style={styles.statsContainer}>
+        <View style={styles.card}>
+          <Text style={styles.statNumber}>{stackItems.length}</Text>
+          <Text>Stack</Text>
+        </View>
 
+        <View style={styles.card}>
+          <Text style={styles.statNumber}>{queueItems.length}</Text>
+          <Text>Queue</Text>
+        </View>
+
+        <View style={styles.card}>
+          <Text style={styles.statNumber}>{historyItems.length}</Text>
+          <Text>Completed</Text>
+        </View>
+      </View>
+
+      {/* Navigation Buttons */}
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Stack")}
       >
-        <Text style={styles.buttonText}>Stack (LIFO)</Text>
+        <Text style={styles.buttonText}>Go to Stack</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("Queue")}
       >
-        <Text style={styles.buttonText}>Queue (FIFO)</Text>
+        <Text style={styles.buttonText}>Go to Queue</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate("SavedItems")}
       >
-        <Text style={styles.buttonText}>Completed Activities</Text>
+        <Text style={styles.buttonText}>View Completed</Text>
       </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate("About")}
-      >
-        <Text style={styles.buttonText}>About</Text>
-      </TouchableOpacity>
-
     </View>
   );
 }
@@ -43,31 +55,45 @@ export default function HomeScreen({ navigation }: any) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: "center",
     padding: 20,
-    backgroundColor: "#f5f5f5"
+    backgroundColor: "#f4f6f8",
+    justifyContent: "center"
   },
   title: {
-    fontSize: 32,
+    fontSize: 28,
     fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 10
-  },
-  subtitle: {
-    textAlign: "center",
     marginBottom: 30,
-    color: "gray"
+    textAlign: "center"
   },
-  button: {
-    backgroundColor: "#327ed5ff",
+  statsContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 30
+  },
+  card: {
+    flex: 1,
+    backgroundColor: "#fff",
     padding: 15,
     borderRadius: 10,
-    marginVertical: 8
+    alignItems: "center",
+    marginHorizontal: 5,
+    elevation: 3
+  },
+  statNumber: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#4CAF50"
+  },
+  button: {
+    backgroundColor: "#4CAF50",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 10
   },
   buttonText: {
-    color: "white",
-    textAlign: "center",
-    fontSize: 16,
-    fontWeight: "bold"
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 16
   }
 });

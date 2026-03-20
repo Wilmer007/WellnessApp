@@ -1,79 +1,176 @@
-import React, { useState, useContext } from "react";
-import { View, Text, TextInput, Button, FlatList, StyleSheet } from "react-native";
+import React, { useContext, useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  FlatList,
+  StyleSheet,
+  Alert
+} from "react-native";
 import { DataContext } from "../Context/DataContext";
 
 export default function QueueScreen() {
-
-  const context = useContext(DataContext);
-  if (!context) throw new Error("Context error");
-
-  const { queueItems, addQueueItem, removeQueueItem, completeActivity } = context;
+  const {
+    queueItems,
+    enqueue,
+    removeQueueAt,
+    completeActivity
+  } = useContext(DataContext);
 
   const [input, setInput] = useState("");
+  const [priority, setPriority] = useState("Low");
+  const [seconds, setSeconds] = useState("");
 
-  const handleAdd = () => {
-    if (!input.trim()) return;
-    addQueueItem(input);
-    setInput("");
+  const getColor = (priority: string) => {
+    if (priority === "High") return "#f44336";
+    if (priority === "Medium") return "#ff9800";
+    return "#4CAF50";
   };
 
-  const handleComplete = () => {
-    if (queueItems.length === 0) return;
+  const handleAdd = () => {
+    if (!input) return;
 
-    const item = queueItems[0];
-    completeActivity(item.title, "Queue (FIFO)");
-    removeQueueItem();
+    const item = { title: input, priority };
+
+    enqueue(item);
+
+    // ⏱ REMINDER
+    if (seconds) {
+      setTimeout(() => {
+        Alert.alert("Reminder 🔔", `Time for: ${input}`);
+      }, parseInt(seconds) * 1000);
+    }
+
+    setInput("");
+    setSeconds("");
   };
 
   return (
     <View style={styles.container}>
-
-      <Text style={styles.title}>Queue (FIFO)</Text>
+      <Text style={styles.title}>Stack (LIFO)</Text>
 
       <TextInput
-        style={styles.input}
-        placeholder="Enter activity"
+        placeholder="Activity..."
         value={input}
         onChangeText={setInput}
+        style={styles.input}
       />
 
-      <Button title="Enqueue Activity" onPress={handleAdd} />
-      <Button title="Complete First Activity" onPress={handleComplete} />
-
-
-<Text style={{ marginTop: 10, fontWeight: "bold" }}>
-  First →
-</Text>
-
-      <FlatList
-        data={queueItems}
-        keyExtractor={(item, index) => index.toString()}
-        renderItem={({ item }) => (
-          <View style={styles.itemCard}>
-            <Text>{item.title}</Text>
-          </View>
-        )}
+      <TextInput
+        placeholder="Reminder (seconds)"
+        value={seconds}
+        onChangeText={setSeconds}
+        keyboardType="numeric"
+        style={styles.input}
       />
-      <Text style={{ marginTop: 10, fontWeight: "bold" }}>
-  ← Last
-</Text>
 
+      <View style={styles.priorityRow}>
+        {["Low", "Medium", "High"].map(p => (
+          <TouchableOpacity
+            key={p}
+            onPress={() => setPriority(p)}
+            style={[
+              styles.priorityButton,
+              priority === p && styles.activePriority
+            ]}
+          >
+            <Text>{p}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      <TouchableOpacity style={styles.addButton} onPress={handleAdd}>
+        <Text style={styles.buttonText}>Add Activity</Text>
+      </TouchableOpacity>
+
+      {queueItems.length === 0 ? (
+        <Text style={styles.emptyText}>No activities yet 💪</Text>
+      ) : (
+        <FlatList
+          data={queueItems}
+          keyExtractor={(_, i) => i.toString()}
+          renderItem={({ item, index }) => (
+            <View
+              style={[
+                styles.card,
+                { borderLeftColor: getColor(item.priority) }
+              ]}
+            >
+              <Text>
+                {item.title} ({item.priority})
+              </Text>
+
+              <View style={styles.smallRow}>
+                <TouchableOpacity
+                  style={styles.completeBtn}
+                  onPress={() => completeActivity(item)}
+                >
+                  <Text style={styles.smallText}>✓</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.deleteBtn}
+                  onPress={() => removeQueueAt(index)}
+                >
+                  <Text style={styles.smallText}>✕</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+        />
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container:{ flex:1, padding:20 },
-  title:{ fontSize:24, fontWeight:"bold" },
-  input:{ borderWidth:1, marginVertical:10, padding:10 },
-  item:{ padding:10, borderWidth:1, marginVertical:5 },
-  itemCard: {
-  padding: 12,
-  borderRadius: 10,
-  backgroundColor: "white",
-  marginVertical: 5,
-  elevation: 2
-}
+  container: { flex: 1, padding: 20, backgroundColor: "#f4f6f8" },
+  title: { fontSize: 24, fontWeight: "bold" },
+  input: {
+    borderWidth: 1,
+    padding: 10,
+    marginVertical: 5,
+    borderRadius: 8,
+    backgroundColor: "#fff"
+  },
+  addButton: {
+    backgroundColor: "#4CAF50",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginVertical: 10
+  },
+  buttonText: { color: "#fff", fontWeight: "bold" },
+  priorityRow: { flexDirection: "row" },
+  priorityButton: {
+    padding: 8,
+    backgroundColor: "#ddd",
+    marginRight: 5,
+    borderRadius: 6
+  },
+  activePriority: { backgroundColor: "#4CAF50" },
+  emptyText: { textAlign: "center", marginTop: 20 },
+  card: {
+    backgroundColor: "#fff",
+    padding: 15,
+    marginVertical: 5,
+    borderRadius: 10,
+    borderLeftWidth: 5
+  },
+  smallRow: { flexDirection: "row", marginTop: 10 },
+  completeBtn: {
+    backgroundColor: "#4CAF50",
+    padding: 6,
+    borderRadius: 6,
+    marginRight: 10
+  },
+  deleteBtn: {
+    backgroundColor: "#f44336",
+    padding: 6,
+    borderRadius: 6
+  },
+  smallText: { color: "#fff", fontSize: 12 }
 });
 
 // AQUIIIIIIIIIII

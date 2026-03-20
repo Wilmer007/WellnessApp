@@ -1,64 +1,30 @@
 import React, { createContext, useState } from "react";
 
-export type WellnessItem = {
-  title: string;
-};
+export const DataContext = createContext<any>(null);
 
-export type HistoryItem = {
-  title: string;
-  structure: string;
-  completedAt: string;
-};
+export const DataProvider = ({ children }: any) => {
+  const [stackItems, setStackItems] = useState<any[]>([]);
+  const [queueItems, setQueueItems] = useState<any[]>([]);
+  const [historyItems, setHistoryItems] = useState<any[]>([]);
 
-type DataContextType = {
-  stackItems: WellnessItem[];
-  queueItems: WellnessItem[];
-  historyItems: HistoryItem[];
-
-  addStackItem: (title: string) => void;
-  removeStackItem: () => void;
-
-  addQueueItem: (title: string) => void;
-  removeQueueItem: () => void;
-
-  completeActivity: (title: string, structure: string) => void;
-};
-
-export const DataContext = createContext<DataContextType | undefined>(undefined);
-
-export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-
-  const [stackItems, setStackItems] = useState<WellnessItem[]>([]);
-  const [queueItems, setQueueItems] = useState<WellnessItem[]>([]);
-  const [historyItems, setHistoryItems] = useState<HistoryItem[]>([]);
-
-  // STACK (LIFO)
-  const addStackItem = (title: string) => {
-    setStackItems(prev => [...prev, { title }]);
+  const pushToStack = (item: any) => {
+    setStackItems(prev => [...prev, item]);
   };
 
-  const removeStackItem = () => {
-    setStackItems(prev => prev.slice(0, -1));
+  const enqueue = (item: any) => {
+    setQueueItems(prev => [...prev, item]);
   };
 
-  // QUEUE (FIFO)
-  const addQueueItem = (title: string) => {
-    setQueueItems(prev => [...prev, { title }]);
+  const removeStackAt = (index: number) => {
+    setStackItems(prev => prev.filter((_, i) => i !== index));
   };
 
-  const removeQueueItem = () => {
-    setQueueItems(prev => prev.slice(1));
+  const removeQueueAt = (index: number) => {
+    setQueueItems(prev => prev.filter((_, i) => i !== index));
   };
 
-  // HISTORY
-  const completeActivity = (title: string, structure: string) => {
-    const newItem: HistoryItem = {
-      title,
-      structure,
-      completedAt: new Date().toLocaleString()
-    };
-
-    setHistoryItems(prev => [...prev, newItem]);
+  const completeActivity = (item: any) => {
+    setHistoryItems(prev => [...prev, item]);
   };
 
   return (
@@ -67,10 +33,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         stackItems,
         queueItems,
         historyItems,
-        addStackItem,
-        removeStackItem,
-        addQueueItem,
-        removeQueueItem,
+        pushToStack,
+        enqueue,
+        removeStackAt,
+        removeQueueAt,
         completeActivity
       }}
     >

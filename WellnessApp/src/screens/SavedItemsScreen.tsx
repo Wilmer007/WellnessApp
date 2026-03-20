@@ -3,39 +3,42 @@ import { View, Text, FlatList, StyleSheet } from "react-native";
 import { DataContext } from "../Context/DataContext";
 
 export default function SavedItemsScreen() {
-
-  const context = useContext(DataContext);
-  if (!context) throw new Error("Context error");
-
-  const { historyItems } = context;
+  const { historyItems } = useContext(DataContext);
 
   return (
     <View style={styles.container}>
-
       <Text style={styles.title}>Completed Activities</Text>
 
       {historyItems.length === 0 ? (
-        <Text>No activities yet</Text>
+        <Text style={styles.emptyText}>
+          No completed activities yet ✅
+        </Text>
       ) : (
         <FlatList
           data={historyItems}
-          keyExtractor={(item, index) => index.toString()}
+          keyExtractor={(_, index) => index.toString()}
           renderItem={({ item }) => (
-            <View style={styles.item}>
-              <Text>{item.title}</Text>
-              <Text>{item.structure}</Text>
-              <Text>{item.completedAt}</Text>
+            <View style={styles.card}>
+              <Text style={styles.itemText}>
+                {item.title} ({item.priority})
+              </Text>
             </View>
           )}
         />
       )}
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container:{ flex:1, padding:20 },
-  title:{ fontSize:24, fontWeight:"bold" },
-  item:{ padding:10, borderWidth:1, marginVertical:5 }
+  container: { flex: 1, padding: 20, backgroundColor: "#f4f6f8" },
+  title: { fontSize: 24, fontWeight: "bold", marginBottom: 10 },
+  emptyText: { textAlign: "center", marginTop: 20, color: "#777" },
+  card: {
+    backgroundColor: "#fff",
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10
+  },
+  itemText: { fontSize: 16 }
 });
