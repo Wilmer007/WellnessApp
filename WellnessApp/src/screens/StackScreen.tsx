@@ -20,12 +20,29 @@ export default function StackScreen() {
 
   const [input, setInput] = useState("");
   const [priority, setPriority] = useState("Low");
-  const [seconds, setSeconds] = useState("");
+
+  const [timeValue, setTimeValue] = useState("");
+  const [timeType, setTimeType] = useState("seconds");
 
   const getColor = (priority: string) => {
     if (priority === "High") return "#f44336";
     if (priority === "Medium") return "#ff9800";
     return "#4CAF50";
+  };
+
+  const scheduleReminder = (title: string) => {
+    if (!timeValue) return;
+
+    let delay = parseInt(timeValue);
+
+    if (timeType === "minutes") delay *= 60;
+    if (timeType === "hours") delay *= 3600;
+
+    delay *= 1000;
+
+    setTimeout(() => {
+      Alert.alert("Reminder 🔔", `Time for: ${title}`);
+    }, delay);
   };
 
   const handleAdd = () => {
@@ -34,16 +51,19 @@ export default function StackScreen() {
     const item = { title: input, priority };
 
     pushToStack(item);
-
-    // ⏱ REMINDER
-    if (seconds) {
-      setTimeout(() => {
-        Alert.alert("Reminder 🔔", `Time for: ${input}`);
-      }, parseInt(seconds) * 1000);
-    }
+    scheduleReminder(input);
 
     setInput("");
-    setSeconds("");
+    setTimeValue("");
+  };
+
+  // ⭐ STACK COMPLETE (LIFO)
+  const handleComplete = () => {
+    if (stackItems.length === 0) return;
+
+    const lastItem = stackItems[stackItems.length - 1];
+    completeActivity(lastItem);
+    removeStackAt(stackItems.length - 1);
   };
 
   return (
@@ -58,21 +78,38 @@ export default function StackScreen() {
       />
 
       <TextInput
-        placeholder="Reminder (seconds)"
-        value={seconds}
-        onChangeText={setSeconds}
+        placeholder="Enter time..."
+        value={timeValue}
+        onChangeText={setTimeValue}
         keyboardType="numeric"
         style={styles.input}
       />
 
-      <View style={styles.priorityRow}>
+      {/* TIME TYPE */}
+      <View style={styles.row}>
+        {["seconds", "minutes", "hours"].map(type => (
+          <TouchableOpacity
+            key={type}
+            onPress={() => setTimeType(type)}
+            style={[
+              styles.smallBtn,
+              timeType === type && styles.activeBtn
+            ]}
+          >
+            <Text>{type}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* PRIORITY */}
+      <View style={styles.row}>
         {["Low", "Medium", "High"].map(p => (
           <TouchableOpacity
             key={p}
             onPress={() => setPriority(p)}
             style={[
-              styles.priorityButton,
-              priority === p && styles.activePriority
+              styles.smallBtn,
+              priority === p && styles.activeBtn
             ]}
           >
             <Text>{p}</Text>
@@ -82,6 +119,11 @@ export default function StackScreen() {
 
       <TouchableOpacity style={styles.addButton} onPress={handleAdd}>
         <Text style={styles.buttonText}>Add Activity</Text>
+      </TouchableOpacity>
+
+      {/* ⭐ COMPLETE BUTTON */}
+      <TouchableOpacity style={styles.completeMainBtn} onPress={handleComplete}>
+        <Text style={styles.buttonText}>Complete Activity (LIFO)</Text>
       </TouchableOpacity>
 
       {stackItems.length === 0 ? (
@@ -101,21 +143,13 @@ export default function StackScreen() {
                 {item.title} ({item.priority})
               </Text>
 
-              <View style={styles.smallRow}>
-                <TouchableOpacity
-                  style={styles.completeBtn}
-                  onPress={() => completeActivity(item)}
-                >
-                  <Text style={styles.smallText}>✓</Text>
-                </TouchableOpacity>
-
-                <TouchableOpacity
-                  style={styles.deleteBtn}
-                  onPress={() => removeStackAt(index)}
-                >
-                  <Text style={styles.smallText}>✕</Text>
-                </TouchableOpacity>
-              </View>
+              {/* DELETE ONLY */}
+              <TouchableOpacity
+                style={styles.deleteBtn}
+                onPress={() => removeStackAt(index)}
+              >
+                <Text style={styles.smallText}>Delete</Text>
+              </TouchableOpacity>
             </View>
           )}
         />
@@ -127,6 +161,7 @@ export default function StackScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#f4f6f8" },
   title: { fontSize: 24, fontWeight: "bold" },
+
   input: {
     borderWidth: 1,
     padding: 10,
@@ -134,6 +169,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     backgroundColor: "#fff"
   },
+
+  row: { flexDirection: "row", marginVertical: 5 },
+
+  smallBtn: {
+    padding: 8,
+    backgroundColor: "#ddd",
+    marginRight: 5,
+    borderRadius: 6
+  },
+
+  activeBtn: { backgroundColor: "#4CAF50" },
+
   addButton: {
     backgroundColor: "#4CAF50",
     padding: 12,
@@ -141,16 +188,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginVertical: 10
   },
-  buttonText: { color: "#fff", fontWeight: "bold" },
-  priorityRow: { flexDirection: "row" },
-  priorityButton: {
-    padding: 8,
-    backgroundColor: "#ddd",
-    marginRight: 5,
-    borderRadius: 6
+
+  completeMainBtn: {
+    backgroundColor: "#2196F3",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 10
   },
-  activePriority: { backgroundColor: "#4CAF50" },
+
+  buttonText: { color: "#fff", fontWeight: "bold" },
+
   emptyText: { textAlign: "center", marginTop: 20 },
+
   card: {
     backgroundColor: "#fff",
     padding: 15,
@@ -158,18 +208,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderLeftWidth: 5
   },
-  smallRow: { flexDirection: "row", marginTop: 10 },
-  completeBtn: {
-    backgroundColor: "#4CAF50",
-    padding: 6,
-    borderRadius: 6,
-    marginRight: 10
-  },
+
   deleteBtn: {
     backgroundColor: "#f44336",
     padding: 6,
-    borderRadius: 6
+    borderRadius: 6,
+    marginTop: 10,
+    alignSelf: "flex-start"
   },
+
   smallText: { color: "#fff", fontSize: 12 }
 });
 
